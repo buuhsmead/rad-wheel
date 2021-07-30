@@ -4,7 +4,7 @@ pipeline {
         kubernetes {
             cloud 'azure-ocp-sandbox'
             namespace 'azure-jenkins'
-            // serviceAccount ''
+            serviceAccount 'jenkins'
             yamlFile 'jenkins-pod.yml'
             defaultContainer 'jnlp'
         }
