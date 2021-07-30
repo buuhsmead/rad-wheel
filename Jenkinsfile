@@ -31,19 +31,19 @@ pipeline {
         stage('helm install') {
             steps {
                 sh '''
-                curl -O https://get.helm.sh/helm-v3.6.3-linux-amd64.tar.gz
+                curl -o ${JENKINS_AGENT_WORKDIR}/helm.tar.gz  https://get.helm.sh/helm-v3.6.3-linux-amd64.tar.gz
                 # checksum: 07c100849925623dc1913209cd1a30f0a9b80a5b4d6ff2153c609d11b043e262
-                tar -zxvf helm-v3.6.3-linux-amd64.tar.gz
-                mv linux-amd64/helm /usr/local/bin/helm
+                tar -zxvf ${JENKINS_AGENT_WORKDIR}/helm.tar.gz
+                #mv linux-amd64/helm /usr/local/bin/helm
                 # chmod +x /usr/local/bin/helm
-                helm help
+                ${JENKINS_AGENT_WORKDIR}/linux-amd64/helm help
                 '''
             }
         }
         
         stage(' helm repos') {
             steps {
-                sh 'helm install .'
+                sh '${JENKINS_AGENT_WORKDIR}/linux-amd64/helm install .'
             }
         }
         
