@@ -18,13 +18,13 @@ pipeline {
         
         stage('Maven package') {
             steps {
-                sh 'mvn clean package'
+                sh 'mvn -B clean package -DskipTests'
             }
         }
   
         stage('Maven test ') {
             steps {
-                sh 'mvn test'
+                sh 'mvn -B test'
             }
         }        
         
@@ -53,7 +53,13 @@ pipeline {
             }
         }
         
-        
+       
+	stage(' create image via BC ') {
+           steps {
+	      sh 'oc start-build rad-wheel-helm'
+           }
+        }
+ 
         
         stage("Deploy to Dev") {
             steps {
