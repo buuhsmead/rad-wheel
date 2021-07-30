@@ -1,82 +1,175 @@
-# Default values for helm.
-# This is a YAML-formatted file.
-# Declare variables to be passed into your templates.
 
-replicaCount: 1
+global:
+  ## Override the release name
+  nameOverride: rad-wheel
 
 image:
-  repository: nginx
-  pullPolicy: IfNotPresent
-  # Overrides the image tag whose default is the chart appVersion.
-  tag: ""
+  ## Name of the image you want to build/deploy
+  ## Defaults to the release name
+  name:
+  ## Tag that you want to build/deploy
+  tag: latest
 
-imagePullSecrets: []
-nameOverride: ""
-fullnameOverride: ""
+## Build-specific values (for configuring BuildConfig and ImageStream)
+build:
+  ## Should build-related resources such as BuildConfig and ImageStream be created?
+  ## Set this to false if you just want to deploy a previously built image.
+  enabled: true
 
-serviceAccount:
-  # Specifies whether a service account should be created
-  create: true
-  # Annotations to add to the service account
-  annotations: {}
-  # The name of the service account to use.
-  # If not set and create is true, a name is generated using the fullname template
-  name: ""
+  ## Git URI, Ref, and ContextDir
+  uri: https://github.com/buuhsmead/rad-wheel.git
+  ref: main
+  contextDir:    
 
-podAnnotations: {}
 
-podSecurityContext: {}
-  # fsGroup: 2000
+  ## Specifies where the image will be pushed to once built
+  ## More information: https://docs.openshift.com/container-platform/4.6/builds/managing-build-output.html
+  output:
+    ## Choices: ImageStreamTag, DockerImage
+    ## ImageStreamTag publishes to the internal registry
+    ## DockerImage publishes to an external registry (referred to by image.name and image.tag)
+    kind: ImageStreamTag
+    ## Push secret name, used only if kind == "DockerImage"
+    pushSecret:
 
-securityContext: {}
-  # capabilities:
-  #   drop:
-  #   - ALL
-  # readOnlyRootFilesystem: true
-  # runAsNonRoot: true
-  # runAsUser: 1000
+  ## Image pull secret. More information: https://docs.openshift.com/container-platform/4.6/openshift_images/managing_images/using-image-pull-secrets.html
+  pullSecret:
+
+  ## Freeform env for the OCP build. More information: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/
+  env:
+  #  - name: VAR_NAME
+  #    value: var-value    
+
+  ## Freeform resources for the OCP build. More information: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  resources:
+  # limits:
+  #   cpu: "4"
+  #   memory: 6Gi
+  #  requests:
+  #    cpu: "2"
+  #    memory: 4Gi
+  #
+
+
+## Application/Deployment-specific values (For configuring Deployment, Service, Route, ConfigMap, etc)
+deploy:
+  ## Number of pod replicas to deploy
+  replicas: 1
+
+
+  ## Freeform resources for Quarkus. More information: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
+  resources:
+  #  limits:
+  #    cpu: 100m
+  #    memory: 256Mi
+  #  requests:
+  #    cpu: 50m
+  #    memory: 128Mi
+
+  ## Type of service to create. More information: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
+  serviceType: ClusterIP
+
+  ## Freeform service ports. More information: https://kubernetes.io/docs/concepts/services-networking/service/#defining-a-service
+  ports:
+    - name: http
+      port: 8080
+      targetPort: 8080
+      protocol: TCP
+
+  ## For creating a Route, allowing your application to be accessed from outside the OCP cluster
+  route:
+    enabled: true
+    targetPort: http
+    ## More information: https://docs.openshift.com/container-platform/4.6/networking/routes/secured-routes.html
+    tls:
+      enabled: true
+      termination: edge
+      insecureEdgeTerminationPolicy: Redirect
+      ## IMPORTANT: Do not check 'key' into git!
+      key:
+      caCertificate:
+      certificate:
+      destinationCACertificate:
+
+
+
+  ## Freeform Liveness Probe. More information: https://docs.openshift.com/container-platform/4.6/applications/application-health.html#application-health-about_application-health
+  livenessProbe:
+    tcpSocket:
+      port: http
+  ## If you don't want a livenessProbe, override like this in your values file
+  # livenessProbe: ''
+
+
+  ## Freeform Readiness Probe. More information: https://docs.openshift.com/container-platform/4.6/applications/application-health.html#application-health-about_application-health
+  readinessProbe:
+    httpGet:
+      path: /
+      port: http
+  ## If you don't want a readinessProbe, override like this in your values file
+  # readinessProve: ''
+
+
+  ## Freeform env for the Quarkus app. More information: https://kubernetes.io/docs/tasks/inject-data-application/define-environment-variable-container/
+  env:
+  #  - name: VAR_NAME
+  #    value: var-value
+
+  ## Freeform envFrom for the Quarkus app. More information: https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/#configure-all-key-value-pairs-in-a-configmap-as-container-environment-variables
+  envFrom:
+  #  - configMapRef:
+  #      name: special-config
+
+
+
+  ## Application properties file for configuring the Quarkus app
+  applicationProperties:
+    ## Determines if application properties should be created in a configmap and mounted to the Quarkus container
+    enabled: false
+    ## Location to mount the properties file
+    mountPath: /deployments/config/
+    ## Application properties file contents
+    properties: |-
+      ## Properties go here
+  ## Freeform volume mounts. More information: https://kubernetes.io/docs/concepts/storage/volumes/
+  volumeMounts:
+  #  - name: my-config
+  #    mountPath: /etc/config
+
+  ## Freeform volumes. More information: https://kubernetes.io/docs/concepts/storage/volumes/
+  volumes:
+  #  - name: my-config
+  #    configMap:
+  #      name: my-configmap
+
+  ## Freeform init containers: More information: https://kubernetes.io/docs/concepts/workloads/pods/init-containers/
+  initContainers:
+  #  - name: my-init-container
+  #    command: ["echo", "hello"]
+  #    image: registry.redhat.io/ubi8/ubi-minimal
+
+  ## Freeform containers: More information: https://kubernetes.io/docs/concepts/workloads/pods/#pod-templates
+  extraContainers:
+  #  - name: my-extra-container
+  #    command: ["sleep", "infinity"]
+  #    image: registry.redhat.io/ubi8/ubi-minimal
+
 
 service:
-  type: ClusterIP
-  port: 80
+  port: 8080
+  type: 'ClusterIP'
+
+serviceAccount:
+  create:
+
 
 ingress:
-  enabled: false
-  className: ""
-  annotations: {}
-    # kubernetes.io/ingress.class: nginx
-    # kubernetes.io/tls-acme: "true"
-  hosts:
-    - host: chart-example.local
-      paths:
-        - path: /
-          pathType: ImplementationSpecific
-  tls: []
-  #  - secretName: chart-example-tls
-  #    hosts:
-  #      - chart-example.local
+  enabled:
 
-resources: {}
-  # We usually recommend not to specify default resources and to leave this as a conscious
-  # choice for the user. This also increases chances charts run on environments with little
-  # resources, such as Minikube. If you do want to specify resources, uncomment the following
-  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
-  # limits:
-  #   cpu: 100m
-  #   memory: 128Mi
-  # requests:
-  #   cpu: 100m
-  #   memory: 128Mi
 
 autoscaling:
-  enabled: false
-  minReplicas: 1
-  maxReplicas: 100
-  targetCPUUtilizationPercentage: 80
-  # targetMemoryUtilizationPercentage: 80
+  enabled:
 
-nodeSelector: {}
 
-tolerations: []
 
-affinity: {}
+

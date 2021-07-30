@@ -1,7 +1,10 @@
+{{- if .Values.build.enabled }}
 kind: BuildConfig
 apiVersion: build.openshift.io/v1
 metadata:
-  name: "rad-wheel"
+  name: {{ include "helm.fullname" . }}
+  labels:
+    {{- include "helm.labels" . | nindent 4 }}    
 spec:
   runPolicy: "Serial"
   output:
@@ -17,11 +20,18 @@ spec:
   strategy:
     type: Docker
     dockerStrategy:
-      #      pullSecret:
-      #        name: jfrog-pull
+{{- if .Values.build.pullSecret }}
+     pullSecret:
+       name: {{ .Values.build.pullSecret }}
+{{- end }}
       dockerfilePath: Dockerfile
   successfulBuildsHistoryLimit: 2
   failedBuildsHistoryLimit: 2
+{{- if .Values.build.resources }}
+  resources:
+    {{- toYaml .Values.build.resources | nindent 4 }}
+{{- end }}    
   triggers:
     - type: ConfigChange
+{{- end }}
 
