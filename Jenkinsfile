@@ -35,15 +35,15 @@ pipeline {
                 # checksum: 07c100849925623dc1913209cd1a30f0a9b80a5b4d6ff2153c609d11b043e262
                 tar -zxvf ${JENKINS_AGENT_WORKDIR}/helm.tar.gz
                 #mv linux-amd64/helm /usr/local/bin/helm
-                # chmod +x /usr/local/bin/helm
-                ${JENKINS_AGENT_WORKDIR}/linux-amd64/helm help
+                chmod +x /home/jenkins/agent/workspace/rad-wheel/linux-amd64/helm
+                /home/jenkins/agent/workspace/rad-wheel/linux-amd64/helm help
                 '''
             }
         }
         
         stage(' helm repos') {
             steps {
-                sh '${JENKINS_AGENT_WORKDIR}/linux-amd64/helm install .'
+                sh '/home/jenkins/agent/workspace/rad-wheel/linux-amd64/helm install .'
             }
         }
         
