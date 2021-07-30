@@ -16,27 +16,15 @@ pipeline {
             }
         }
         
-        stage('S2I build') {
+        stage('Maven package') {
             steps {
                 sh 'mvn clean package'
             }
         }
   
-        stage('S2I bake') {
+        stage('Maven test ') {
             steps {
-                sh 'S2I bake'
-            }
-        }        
-        
-        stage('S2I image tag') {
-            steps {
-                sh 'S2I image tag'
-            }
-        }
-        
-        stage('S2I push') {
-            steps {
-                sh 'S2I push to JFrog'
+                sh 'mvn test'
             }
         }        
         
@@ -55,7 +43,7 @@ pipeline {
         
         stage(' helm repos') {
             steps {
-                sh 'echo "ADD HELM REPO"'
+                sh 'helm install .'
             }
         }
         
