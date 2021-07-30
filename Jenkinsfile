@@ -16,7 +16,6 @@ pipeline {
             }
         }
         
-        
         stage('S2I build') {
             steps {
                 sh 'mvn clean package'
