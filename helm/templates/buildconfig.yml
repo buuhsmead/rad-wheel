@@ -1,0 +1,27 @@
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  name: "rad-wheel"
+spec:
+  runPolicy: "Serial"
+  output:
+    to:
+      kind: ImageStreamTag
+      name: 'rad-wheel:latest'
+  source:
+    git:
+      uri: 'https://github.com/buuhsmead/rad-wheel.git'
+      ref: "main"
+        #    sourceSecret:
+        #      name: git-source
+  strategy:
+    type: Docker
+    dockerStrategy:
+      #      pullSecret:
+      #        name: jfrog-pull
+      dockerfilePath: Dockerfile
+  successfulBuildsHistoryLimit: 2
+  failedBuildsHistoryLimit: 2
+  triggers:
+    - type: ConfigChange
+
