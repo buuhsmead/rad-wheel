@@ -43,7 +43,7 @@ pipeline {
         
         stage(' helm repos') {
             steps {
-                sh '/home/jenkins/agent/workspace/rad-wheel/linux-amd64/helm install .'
+                sh '/home/jenkins/agent/workspace/rad-wheel/linux-amd64/helm install rad-wheel helm'
             }
         }
         
