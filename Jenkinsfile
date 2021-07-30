@@ -56,18 +56,10 @@ pipeline {
        
 	stage(' create image via BC ') {
            steps {
-	      sh 'oc start-build rad-wheel-helm'
+	      sh 'oc start-build rad-wheel-helm --follow -n rad-wheel'
            }
         }
  
-        
-        stage("Deploy to Dev") {
-            steps {
-                script{
-                    sh "# helm upgrade --install my-guestbook shailendra/guestbook --values dev/values.yaml -n dev --wait"
-                }
-            }
-        }
         
         
     }
