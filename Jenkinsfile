@@ -40,10 +40,16 @@ pipeline {
                 '''
             }
         }
-        
+       
+	stage(' helm status ') {
+            steps {
+                sh '/home/jenkins/agent/workspace/rad-wheel/linux-amd64/helm status rad-wheel'
+            }
+       }
+ 
         stage(' helm repos') {
             steps {
-                sh '/home/jenkins/agent/workspace/rad-wheel/linux-amd64/helm install rad-wheel helm'
+                sh '/home/jenkins/agent/workspace/rad-wheel/linux-amd64/helm --debug upgrade rad-wheel helm'
             }
         }
         
