@@ -1,3 +1,4 @@
+
 {{- if .Values.build.enabled }}
 kind: BuildConfig
 apiVersion: build.openshift.io/v1
@@ -6,15 +7,15 @@ metadata:
   labels:
     {{- include "helm.labels" . | nindent 4 }}    
 spec:
-  runPolicy: "Serial"
+  runPolicy: Serial
   output:
     to:
       kind: ImageStreamTag
       name: "{{ .Values.image.name }}:{{ .Values.image.tag | default .Chart.AppVersion }}"  
   source:
     git:
-      uri: 'https://github.com/buuhsmead/rad-wheel.git'
-      ref: "main"
+      uri: {{ .Values.build.uri | squote }}
+      ref: {{ .Values.build.ref }}
         #    sourceSecret:
         #      name: git-source
   strategy:

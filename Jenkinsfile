@@ -9,8 +9,12 @@ pipeline {
             defaultContainer 'jnlp'
         }
 
+
     }
 
+environment {
+    HELM_RELEASE_NAME="rad-wheel"
+}
     stages {
         stage(' Main ') {
             steps {
@@ -49,9 +53,9 @@ pipeline {
             }
         }
 
-        stage(' helm upgrade APP ') {
+        stage(' Helm Install or Upgrade APP ') {
             steps {
-                sh '${WORKSPACE}/linux-amd64/helm --debug upgrade rad-wheel helm'
+                sh '${WORKSPACE}/linux-amd64/helm --debug upgrade --install rad-wheel helm'
             }
         }
 
