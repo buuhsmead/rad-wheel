@@ -47,11 +47,11 @@ environment {
             }
         }
 
-	//    stage(' helm status APP ') {
-        //    steps {
-        //        sh '${WORKSPACE}/linux-amd64/helm status rad-wheel'
-        //    }
-        // }
+	    stage(' helm status APP ') {
+            steps {
+                sh '${WORKSPACE}/linux-amd64/helm status rad-wheel'
+            }
+         }
 
         stage(' Helm Install or Upgrade APP ') {
             steps {
