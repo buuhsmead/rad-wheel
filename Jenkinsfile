@@ -18,6 +18,7 @@ environment {
     stages {
         stage(' Main ') {
             steps {
+		    println LocalDate.now()
                 sh 'hostname'
                 sh 'env'
             }
