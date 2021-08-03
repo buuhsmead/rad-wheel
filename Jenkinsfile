@@ -66,7 +66,7 @@ environment {
               }
             }
            steps {
-	            sh 'oc start-build rad-wheel-helm --follow'
+	            sh 'oc start-build rad-wheel-helm'
             }
         }
 
