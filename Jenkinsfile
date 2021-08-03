@@ -73,7 +73,7 @@ environment {
 
 	    stage ('Create the Helm Package') {
 		    steps {
-			    sh 'helm package helm -d ${JENKINS_AGENT_WORKDIR}'
+			    sh '${WORKSPACE}/linux-amd64/helm package helm -d ${JENKINS_AGENT_WORKDIR}'
 		    }
 	    }
 	    
