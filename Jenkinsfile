@@ -71,6 +71,12 @@ environment {
             }
         }
 
+	    stage ('Create the Helm Package') {
+		    steps {
+			    sh 'helm package helm -d ${JENKINS_AGENT_WORKDIR}'
+		    }
+	    }
+	    
        stage ('image signing') {
 	        steps {
 	            sh 'echo "Image singing is todo, see https://github.com/redhat-cop/image-scanning-signing-service."'
