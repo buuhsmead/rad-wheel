@@ -1,0 +1,22 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: rad-wheel-route
+  labels:
+    app.kubernetes.io/instance: rad-wheel
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: helm
+    app.kubernetes.io/version: 1.16.0
+    helm.sh/chart: helm-0.1.0
+spec:
+  to:
+    kind: Service
+    name: rad-wheel-helm
+    weight: 100
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Allow
+  wildcardPolicy: None
+
