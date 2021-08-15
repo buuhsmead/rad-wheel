@@ -8,8 +8,6 @@ pipeline {
             yamlFile 'jenkins-pod.yml'
             defaultContainer 'jnlp'
         }
-
-
     }
 
 environment {
@@ -18,7 +16,7 @@ environment {
     stages {
         stage(' Main ') {
             steps {
-		sh 'date --iso-8601=seconds'
+		        sh 'date --iso-8601=seconds'
                 sh 'hostname'
                 sh 'env'
             }
@@ -48,48 +46,39 @@ environment {
             }
         }
 
-	    stage(' helm status APP ') {
-            steps {
-                sh '${WORKSPACE}/linux-amd64/helm status rad-wheel'
-            }
-         }
-
-        stage(' Helm Install or Upgrade APP ') {
-            steps {
-                sh '${WORKSPACE}/linux-amd64/helm --debug upgrade --install rad-wheel helm'
-            }
-        }
-
-	    stage(' create image via BC ') {
-            when {
-              expression {
-                currentBuild.result == null || currentBuild.result == 'SUCCESS'
-              }
-            }
-           steps {
-	            sh 'oc start-build rad-wheel-helm'
-            }
-        }
-
 	    stage ('Create the Helm Package') {
 		    steps {
 			    sh '${WORKSPACE}/linux-amd64/helm package helm -d ${JENKINS_AGENT_WORKDIR}'
 		    }
 	    }
-	    
+
+	    stage ('Deploy the App') {
+	        steps {
+	            withCredentials([string(credentialsId: 'token-jenkins-sa', variable: 'BEARER')]) {
+	                sh '''
+	                    ${WORKSPACE}/linux-amd64/helm upgrade --install ${HELM_RELEASE_NAME} helm --kube-apiserver https://${API_OPENSHIFT}:6443 --kube-token ${BEARER} --namespace ${DEPLOY_OPENSHIFT_NS}
+	                '''
+	            }
+	        }
+	    }
+
        stage ('image signing') {
 	        steps {
 	            sh 'echo "Image singing is todo, see https://github.com/redhat-cop/image-scanning-signing-service."'
 	        }
 	    }
 
-        stage ('image copy to jfrog') {
-            steps {
-                sh 'echo "placing container in jfrog including signing is still todo." '
-            }
+    stage ('Push Helm package JFrog') {
+      steps {
+        withCredentials([usernamePassword(credentialsId: "Artifactory", usernameVariable: "DEST_USER", passwordVariable: "DEST_PWD")]) {
+          sh '''
+            curl -v -X PUT --user $DEST_USER:$DEST_PWD --data-binary @"${WORKSPACE}/${HELM_PACKAGE}-${HELM_TAG}.tgz" https://${JFROG_HOST}/${JFROG_REPO}/${HELM_PACKAGE}-${HELM_TAG}.tgz
+          '''
         }
-
+      }
     }
+
+
 }
 
 

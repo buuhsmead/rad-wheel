@@ -1,0 +1,41 @@
+
+{{- if .Values.build.enabled }}
+kind: BuildConfig
+apiVersion: build.openshift.io/v1
+metadata:
+  name: {{ include "maven-template.fullname" . }}
+  labels:
+  {{- include "maven-template.labels" . | nindent 4 }}
+spec:
+  runPolicy: Serial
+  serviceAccount: {{ include "maven-template.serviceAccountName" . }}
+  output:
+    to:
+      kind: ImageStreamTag
+      name: "{{ .Values.image.name }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+  source:
+    git:
+      uri: {{ .Values.build.uri | squote }}
+      ref: {{ .Values.build.ref }}
+    {{- if .Values.build.sourceSecret }}
+    sourceSecret:
+      name: {{ .Values.build.sourceSecret }}
+  {{- end }}
+  strategy:
+    type: Docker
+    dockerStrategy:
+      {{- if .Values.build.pullSecret }}
+      pullSecret:
+        name: {{ .Values.build.pullSecret }}
+        {{- end }}
+        dockerfilePath: Dockerfile
+  successfulBuildsHistoryLimit: 2
+  failedBuildsHistoryLimit: 2
+  {{- if .Values.build.resources }}
+  resources:
+  {{- toYaml .Values.build.resources | nindent 4 }}
+  {{- end }}
+  triggers:
+    - type: ConfigChange
+  {{- end }}
+

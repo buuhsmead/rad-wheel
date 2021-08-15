@@ -1,17 +1,13 @@
 kind: Route
 apiVersion: route.openshift.io/v1
 metadata:
-  name: rad-wheel-route
+  name: {{ include "maven-template.fullname" . }}
   labels:
-    app.kubernetes.io/instance: rad-wheel
-    app.kubernetes.io/managed-by: Helm
-    app.kubernetes.io/name: helm
-    app.kubernetes.io/version: 1.16.0
-    helm.sh/chart: helm-0.1.0
+  {{- include "maven-template.labels" . | nindent 4 }}
 spec:
   to:
     kind: Service
-    name: rad-wheel-helm
+    name: {{ include "maven-template.fullname" . }}
     weight: 100
   port:
     targetPort: http
