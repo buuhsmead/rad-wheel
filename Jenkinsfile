@@ -11,7 +11,7 @@ pipeline {
     }
 
     environment {
-      HELM_RELEASE_NAME="rad-wheel"
+      HELM_RELEASE_NAME="maven-template"
       HELM_CHART_DIR="maven-template"
 
       API_OPENSHIFT="api.guid.it-speeltuin.eu"
