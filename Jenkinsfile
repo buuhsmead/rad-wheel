@@ -10,9 +10,13 @@ pipeline {
         }
     }
 
-environment {
-    HELM_RELEASE_NAME="rad-wheel"
-}
+    environment {
+      HELM_RELEASE_NAME="rad-wheel"
+
+      API_OPENSHIFT="api.guid.it-speeltuin.eu"
+      DEPLOY_OPENSHIFT_NS="maven-template"
+    }
+
     stages {
         stage(' Main ') {
             steps {
@@ -54,9 +58,9 @@ environment {
 
 	    stage ('Deploy the App') {
 	        steps {
-	            withCredentials([string(credentialsId: 'token-jenkins-sa', variable: 'BEARER')]) {
+	            withCredentials([string(credentialsId: 'token-jenkins-sa', variable: 'TOKEN')]) {
 	                sh '''
-	                    ${WORKSPACE}/linux-amd64/helm upgrade --install ${HELM_RELEASE_NAME} helm --kube-apiserver https://${API_OPENSHIFT}:6443 --kube-token ${BEARER} --namespace ${DEPLOY_OPENSHIFT_NS}
+	                    ${WORKSPACE}/linux-amd64/helm upgrade --install ${HELM_RELEASE_NAME} helm --kube-apiserver https://${API_OPENSHIFT}:6443 --kube-token ${TOKEN} --namespace ${DEPLOY_OPENSHIFT_NS}
 	                '''
 	            }
 	        }
@@ -68,17 +72,17 @@ environment {
 	        }
 	    }
 
-    stage ('Push Helm package JFrog') {
-      steps {
-        withCredentials([usernamePassword(credentialsId: "Artifactory", usernameVariable: "DEST_USER", passwordVariable: "DEST_PWD")]) {
-          sh '''
-            curl -v -X PUT --user $DEST_USER:$DEST_PWD --data-binary @"${WORKSPACE}/${HELM_PACKAGE}-${HELM_TAG}.tgz" https://${JFROG_HOST}/${JFROG_REPO}/${HELM_PACKAGE}-${HELM_TAG}.tgz
-          '''
-        }
-      }
-    }
+//     stage ('Push Helm package JFrog') {
+//       steps {
+//         withCredentials([usernamePassword(credentialsId: "Artifactory", usernameVariable: "DEST_USER", passwordVariable: "DEST_PWD")]) {
+//           sh '''
+//             curl -v -X PUT --user $DEST_USER:$DEST_PWD --data-binary @"${WORKSPACE}/${HELM_PACKAGE}-${HELM_TAG}.tgz" https://${JFROG_HOST}/${JFROG_REPO}/${HELM_PACKAGE}-${HELM_TAG}.tgz
+//           '''
+//         }
+//       }
+//     }
 
-
+  }
 }
 
 
