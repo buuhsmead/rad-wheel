@@ -67,11 +67,19 @@ pipeline {
 	        }
 	    }
 
-       stage ('image signing') {
-	        steps {
-	            sh 'echo "Image singing is todo, see https://github.com/redhat-cop/image-scanning-signing-service."'
-	        }
-	    }
+      stage(' Start Build on OCP ') {
+        steps {
+          sh '''
+            oc start-build ${HELM_RELEASE_NAME} -n ${DEPLOY_OPENSHIFT_NS}
+          '''
+        }
+      }
+
+      stage ('image signing') {
+	      steps {
+	        sh 'echo "Image singing is todo, see https://github.com/redhat-cop/image-scanning-signing-service."'
+	      }
+	   }
 
 //     stage ('Push Helm package JFrog') {
 //       steps {
