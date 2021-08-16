@@ -59,7 +59,7 @@ pipeline {
 
 	    stage ('Deploy the App') {
 	        steps {
-	            withCredentials([string(credentialsId: 'token-jenkins-sa', variable: 'TOKEN')]) {
+	            withCredentials([string(credentialsId: 'Jenkins-sa', variable: 'TOKEN')]) {
 	                sh '''
 	                    ${WORKSPACE}/linux-amd64/helm upgrade --install ${HELM_RELEASE_NAME} ${HELM_CHART_DIR} --kube-apiserver https://${API_OPENSHIFT}:6443 --kube-token ${TOKEN} --namespace ${DEPLOY_OPENSHIFT_NS}
 	                '''
