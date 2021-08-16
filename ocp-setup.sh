@@ -21,8 +21,6 @@ echo "===== copy this into a secret-text credential in Jenkins ====="
 echo ${OCP_API_TOKEN}
 echo "===== end ===="
 
-###oc policy add-role-to-user edit system:serviceaccount:${JENKINS_PROJECT}:${JENKINS_PROJECT}
-
 
 # Setup the NAMESPACE the APP will be deployed in
 oc new-project ${OCP_DEPLOY_NS} --display-name "APP from ${HELM_RELEASE_NAME}"
