@@ -61,7 +61,7 @@ pipeline {
 	        steps {
 	            withCredentials([string(credentialsId: 'Jenkins-sa', variable: 'TOKEN')]) {
 	                sh '''
-	                    ${WORKSPACE}/linux-amd64/helm upgrade --install ${HELM_RELEASE_NAME} ${HELM_CHART_DIR} --kube-apiserver https://${API_OPENSHIFT}:6443 --kube-token ${TOKEN} --insecure-skip-tls-verify --namespace ${DEPLOY_OPENSHIFT_NS}
+	                    ${WORKSPACE}/linux-amd64/helm upgrade --install ${HELM_RELEASE_NAME} ${HELM_CHART_DIR} --kube-apiserver https://${API_OPENSHIFT}:6443 --kube-token ${TOKEN} --kube-ca-file kube-apiserver-lb-signer.pem  --namespace ${DEPLOY_OPENSHIFT_NS}
 	                '''
 	            }
 	        }
