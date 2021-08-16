@@ -12,6 +12,8 @@ OCP_DEPLOY_NS=maven-template
 
 oc new-project ${JENKINS_PROJECT} --display-name "Jenkins remote controller"
 oc create serviceaccount ${JENKINS_SA}
+oc policy add-role-to-user admin system:serviceaccount: ${JENKINS_PROJECT}:JENKINS_SA -n ${JENKINS_PROJECT}
+
 OCP_API_TOKEN=$(oc serviceaccounts get-token ${JENKINS_SA} -n ${JENKINS_PROJECT})
 
 echo "===== copy this into a secret-text credential in Jenkins ====="

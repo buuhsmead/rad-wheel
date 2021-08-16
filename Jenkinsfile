@@ -12,6 +12,7 @@ pipeline {
 
     environment {
       HELM_RELEASE_NAME="rad-wheel"
+      HELM_CHART_DIR="maven-template"
 
       API_OPENSHIFT="api.guid.it-speeltuin.eu"
       DEPLOY_OPENSHIFT_NS="maven-template"
@@ -52,7 +53,7 @@ pipeline {
 
 	    stage ('Create the Helm Package') {
 		    steps {
-			    sh '${WORKSPACE}/linux-amd64/helm package helm -d ${JENKINS_AGENT_WORKDIR}'
+			    sh '${WORKSPACE}/linux-amd64/helm package ${HELM_CHART_DIR} -d ${JENKINS_AGENT_WORKDIR}'
 		    }
 	    }
 
@@ -60,7 +61,7 @@ pipeline {
 	        steps {
 	            withCredentials([string(credentialsId: 'token-jenkins-sa', variable: 'TOKEN')]) {
 	                sh '''
-	                    ${WORKSPACE}/linux-amd64/helm upgrade --install ${HELM_RELEASE_NAME} helm --kube-apiserver https://${API_OPENSHIFT}:6443 --kube-token ${TOKEN} --namespace ${DEPLOY_OPENSHIFT_NS}
+	                    ${WORKSPACE}/linux-amd64/helm upgrade --install ${HELM_RELEASE_NAME} ${HELM_CHART_DIR} --kube-apiserver https://${API_OPENSHIFT}:6443 --kube-token ${TOKEN} --namespace ${DEPLOY_OPENSHIFT_NS}
 	                '''
 	            }
 	        }
